@@ -54,10 +54,9 @@ if($vbulletin->userinfo['userid']){
 				$db->query_write("INSERT INTO ".TABLE_PREFIX."gamescore(gid, uid, score, time) VALUES({$gameid}, {$vbulletin->userinfo['userid']}, {$score}, " . time() . ")");
 			}
 			echo 'Điểm của bạn đã được lưu vào hệ thống!';
-			//create log
+			//create txt
 			/*
-			$avatars = $db->query_read("SELECT filedata FROM ".TABLE_PREFIX."customavatar WHERE userid = {$vbulletin->userinfo['userid']}");
-			$avatar = $db->fetch_array($avatars);
+			chi de trong 1 - 2 file txt de de dang tuy chinh hien thi so play ticker
 			*/
 			$data = array(
 				'userid' => $vbulletin->userinfo['userid'],
@@ -67,21 +66,30 @@ if($vbulletin->userinfo['userid']){
 				'gameicon' => $scoredetail['icon'],
 				'score' => number_format($score)
 			);
-			//Rename log #3 to #4
-			$logContent = file_get_contents('games/gameticker3.log');
-			$fp = file_put_contents('games/gameticker4.log', $logContent);
-			//Rename log #2 to #3
-			$logContent = file_get_contents('games/gameticker2.log');
-			$fp = file_put_contents('games/gameticker3.log', $logContent);
-			//Rename log #1 to #2
-			$logContent = file_get_contents('games/gameticker.log');
-			$fp = file_put_contents('games/gameticker2.log', $logContent);
-			#1
-			$logContent = '[' . json_encode($data) . ']';
-			$fp = fopen('games/gameticker.log', 'w+');
-			fwrite($fp, $logContent);
-			fclose($fp);
-			//end create log
+			// Khai bao ten tap tin
+$txtf = "games/gameticker.txt";
+
+// Dua noi dung cua tap tin vao mang
+$datatxt = file($txtf);
+// Xoa dong can xoa
+$delrtxt = $vbulletin->options['games_playticker'];
+unset ($datatxt[$delrtxt]);
+
+// thiet lap lai chi so cua mang
+$datatxt = array_values($datatxt);
+// xoa thong so cu
+unlink($txtf);
+// dua thong so moi vao
+$txtContent = '[' . json_encode($data) . ']';
+			$txtfp = fopen($txtf, 'a+');
+			fwrite($txtfp, $txtContent."\n".implode($datatxt));
+			fclose($txtfp);
+			////txt2/////
+			$fptxt2 = fopen('games/gameticker2.txt', 'w+');
+			fwrite($fptxt2, $txtContent);
+			fclose($fptxt2);
+
+			//end create txt
 		}else{
 			echo "Số điểm lần trước của bạn là {$highscoreFormated} điểm, bạn vẫn chưa vượt qua được ngưỡng của chính mình!";
 		}
