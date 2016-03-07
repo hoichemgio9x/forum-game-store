@@ -1,0 +1,1 @@
+Game Store v1.0 for vBulletin 4.1.x
